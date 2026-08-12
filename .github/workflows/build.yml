@@ -1,11 +1,9 @@
 name: Build APK
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   workflow_dispatch:
+  push:
+    branches: ["main"]
 
 jobs:
   build:
@@ -19,24 +17,21 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
-      - name: Install Android SDK 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
-        if: ${{ hashFiles('gradlew') != '' }}
-
-      - name: Build with Gradle installed by action
-        if: ${{ hashFiles('gradlew') == '' }}
+      - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
 
-      - name: Build debug APK (fallback)
-        if: ${{ hashFiles('gradlew') == '' }}
+      - name: Build APK
         run: gradle assembleDebug
 
       - name: Upload APK
